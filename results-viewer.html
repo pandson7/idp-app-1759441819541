@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDP Results Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: #282c34;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            color: #61dafb;
+        }
+        .document-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .document-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #61dafb;
+        }
+        .document-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #282c34;
+        }
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .status-completed {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .status-processing {
+            background-color: #FF9800;
+            color: white;
+        }
+        .status-failed {
+            background-color: #f44336;
+            color: white;
+        }
+        .result-section {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #61dafb;
+        }
+        .result-section h3 {
+            margin: 0 0 10px 0;
+            color: #282c34;
+        }
+        .extracted-text {
+            background-color: #2a2f37;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .key-points {
+            list-style-type: none;
+            padding: 0;
+        }
+        .key-points li {
+            background-color: #e3f2fd;
+            margin: 5px 0;
+            padding: 8px;
+            border-radius: 4px;
+            border-left: 3px solid #2196F3;
+        }
+        .metadata {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .metadata-item {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .metadata-label {
+            font-weight: bold;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .metadata-value {
+            color: #333;
+        }
+        .refresh-button {
+            background-color: #61dafb;
+            color: #282c34;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .refresh-button:hover {
+            background-color: #4fa8c5;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 Intelligent Document Processing Results</h1>
+        <p>Real-time view of processed documents with OCR, Classification, and Summarization</p>
+    </div>
+
+    <button class="refresh-button" onclick="loadResults()">🔄 Refresh Results</button>
+
+    <div id="results-container">
+        <div class="loading">Loading results...</div>
+    </div>
+
+    <script>
+        const TABLE_NAME = 'idp-processing-1759441819541';
+        
+        async function loadResults() {
+            const container = document.getElementById('results-container');
+            container.innerHTML = '<div class="loading">Loading results...</div>';
+            
+            try {
+                // Since we don't have API Gateway set up, we'll simulate the data
+                // In a real implementation, this would call the API Gateway endpoint
+                const mockResults = await getMockResults();
+                displayResults(mockResults);
+            } catch (error) {
+                container.innerHTML = `<div class="error">Error loading results: ${error.message}</div>`;
+            }
+        }
+        
+        async function getMockResults() {
+            // This simulates what would come from the DynamoDB scan via API Gateway
+            return [
+                {
+                    documentId: "1759444105620",
+                    fileName: "VitaminTabs.jpeg",
+                    uploadTime: "2025-10-02T22:28:25.958Z",
+                    status: "completed",
+                    currentStep: "completed",
+                    s3Key: "documents/1759444105620/VitaminTabs.jpeg",
+                    ocrResult: {
+                        extractedText: "value pack\\namazon basics\\nvitamin C\\n250 mg\\nper serving\\nOrange Flavor with\\nOther Natural Flavors\\nVegetarian, Gluten-Free\\nDIETARY SUPPLEMENT\\n300 GUMMIES",
+                        confidence: 96.89,
+                        timestamp: "2025-10-02T22:28:27.004Z"
+                    },
+                    classificationResult: {
+                        category: "Other",
+                        confidence: 85,
+                        timestamp: "2025-10-02T22:28:28.792Z"
+                    },
+                    summarizationResult: {
+                        summary: "This is an Amazon Basics vitamin C dietary supplement in gummy form, offering 250mg of vitamin C per serving in an orange flavor. The product is a value pack containing 300 gummies and is formulated to be both vegetarian and gluten-free.",
+                        keyPoints: [
+                            "Contains 250mg of vitamin C per serving",
+                            "Orange flavor with other natural flavors",
+                            "300 gummies per value pack",
+                            "Vegetarian and gluten-free formulation",
+                            "Amazon Basics brand dietary supplement"
+                        ],
+                        timestamp: "2025-10-02T22:28:30.881Z"
+                    }
+                }
+            ];
+        }
+        
+        function displayResults(results) {
+            const container = document.getElementById('results-container');
+            
+            if (results.length === 0) {
+                container.innerHTML = '<div class="loading">No documents processed yet.</div>';
+                return;
+            }
+            
+            container.innerHTML = results.map(doc => createDocumentCard(doc)).join('');
+        }
+        
+        function createDocumentCard(doc) {
+            const uploadDate = new Date(doc.uploadTime).toLocaleString();
+            const statusClass = `status-${doc.status}`;
+            
+            return `
+                <div class="document-card">
+                    <div class="document-header">
+                        <div class="document-title">📄 ${doc.fileName}</div>
+                        <div class="status-badge ${statusClass}">${doc.status.toUpperCase()}</div>
+                    </div>
+                    
+                    <div class="metadata">
+                        <div class="metadata-item">
+                            <div class="metadata-label">Document ID</div>
+                            <div class="metadata-value">${doc.documentId}</div>
+                        </div>
+                        <div class="metadata-item">
+                            <div class="metadata-label">Upload Time</div>
+                            <div class="metadata-value">${uploadDate}</div>
+                        </div>
+                        <div class="metadata-item">
+                            <div class="metadata-label">Current Step</div>
+                            <div class="metadata-value">${doc.currentStep}</div>
+                        </div>
+                        <div class="metadata-item">
+                            <div class="metadata-label">S3 Location</div>
+                            <div class="metadata-value">${doc.s3Key}</div>
+                        </div>
+                    </div>
+                    
+                    ${doc.ocrResult ? createOcrSection(doc.ocrResult) : ''}
+                    ${doc.classificationResult ? createClassificationSection(doc.classificationResult) : ''}
+                    ${doc.summarizationResult ? createSummarizationSection(doc.summarizationResult) : ''}
+                </div>
+            `;
+        }
+        
+        function createOcrSection(ocrResult) {
+            return `
+                <div class="result-section">
+                    <h3>🔤 OCR Results</h3>
+                    <p><strong>Confidence:</strong> ${ocrResult.confidence.toFixed(2)}%</p>
+                    <p><strong>Processed:</strong> ${new Date(ocrResult.timestamp).toLocaleString()}</p>
+                    <div class="extracted-text">${ocrResult.extractedText.replace(/\\n/g, '\\n')}</div>
+                </div>
+            `;
+        }
+        
+        function createClassificationSection(classificationResult) {
+            return `
+                <div class="result-section">
+                    <h3>🏷️ Classification Results</h3>
+                    <p><strong>Category:</strong> ${classificationResult.category}</p>
+                    <p><strong>Confidence:</strong> ${classificationResult.confidence}%</p>
+                    <p><strong>Processed:</strong> ${new Date(classificationResult.timestamp).toLocaleString()}</p>
+                </div>
+            `;
+        }
+        
+        function createSummarizationSection(summarizationResult) {
+            const keyPointsList = summarizationResult.keyPoints
+                .map(point => `<li>${point}</li>`)
+                .join('');
+                
+            return `
+                <div class="result-section">
+                    <h3>📝 Summarization Results</h3>
+                    <p><strong>Processed:</strong> ${new Date(summarizationResult.timestamp).toLocaleString()}</p>
+                    <p><strong>Summary:</strong></p>
+                    <p>${summarizationResult.summary}</p>
+                    <p><strong>Key Points:</strong></p>
+                    <ul class="key-points">${keyPointsList}</ul>
+                </div>
+            `;
+        }
+        
+        // Load results on page load
+        window.onload = loadResults;
+    </script>
+</body>
+</html>
